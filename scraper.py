@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import sqlite3
 import utils
-from utils import is_float
+from utils import parse_wikipedia_number_string_to_int, parse_wikipedia_number_string_to_float
 
 # Establish connection with the database to save the scraped data
 # in the countries table
@@ -46,8 +46,12 @@ def scrape_wikipedia():
             population = int(population_as_string) if population_as_string.isdigit() else None
 
             area, density, capital, neighbors, language, timezone, regime = scrape_country_details(country_url)
-            if(area is None):
-                print(name_link['href'])
+
+            if density == -1.0:
+                if area != -1:
+                    density = round(population / area,1)
+
+            print(f"{name} - {density}")
 
 
 def scrape_country_details(url):
@@ -55,7 +59,11 @@ def scrape_country_details(url):
     soup = BeautifulSoup(response.text, 'html.parser')
     infobox = soup.find('table', {'class': 'infocaseta'})
 
-    area, density, capital, neighbors, language, timezone, regime = None, None, None, None, None, None, None
+    # Set default values to the fields
+    area, density, capital, neighbors, language, timezone, regime = -1, -1.0, "Unknown", "Unknown", "Unknown", "Unknown", "Unknown"
+    # Variable used for keeping old title with the purpose of
+    # checking if the row is adjacent to the area field in the table
+    # due to the way the country data is displayed in romanian wikipedia pages
     old_row_title = None
 
     if infobox:
@@ -71,9 +79,9 @@ def scrape_country_details(url):
                 value = td.get_text(strip=True)
 
                 if 'total' in key and "Suprafață" in old_row_title:
-                    area = value
+                    area = parse_wikipedia_number_string_to_int(value)
                 elif 'densitate' in key:
-                    density = value
+                    density = round(parse_wikipedia_number_string_to_float(value), 1)
                 elif 'capitala' in key:
                     capital = value
                 elif 'vecini' in key:
