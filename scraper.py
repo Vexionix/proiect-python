@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import sqlite3
+import utils
+from utils import is_float
 
 # Establish connection with the database to save the scraped data
 # in the countries table
@@ -31,8 +33,61 @@ def scrape_wikipedia():
                 continue
 
             name = name_link.text.strip()
+
+            if name_link['href'] == "/wiki/Jersey":
+                name_link['href'] = "/wiki/Insula_Jersey"
+
+            if name_link['href'] == "/wiki/Sf%C3%A2nta_Lucia":
+                name_link['href'] = "/wiki/Sf%C3%A2nta_Lucia_(stat)"
+
             country_url = base_url + name_link['href']
-            print(name + ' - ' + country_url)
+
+            population_as_string = cols[2].text.strip().replace(".", "")
+            population = int(population_as_string) if population_as_string.isdigit() else None
+
+            area, density, capital, neighbors, language, timezone, regime = scrape_country_details(country_url)
+            if(area is None):
+                print(name_link['href'])
+
+
+def scrape_country_details(url):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    infobox = soup.find('table', {'class': 'infocaseta'})
+
+    area, density, capital, neighbors, language, timezone, regime = None, None, None, None, None, None, None
+    old_row_title = None
+
+    if infobox:
+        rows = infobox.find_all('tr')
+
+        for row in rows:
+            th = row.find('th')
+            td = row.find('td')
+
+            if th and td:
+                key = th.get_text(
+                    strip=True).lower()
+                value = td.get_text(strip=True)
+
+                if 'total' in key and "Suprafață" in old_row_title:
+                    area = value
+                elif 'densitate' in key:
+                    density = value
+                elif 'capitala' in key:
+                    capital = value
+                elif 'vecini' in key:
+                    neighbors = value
+                elif 'limbi oficiale' in key:
+                    language = value
+                elif 'fus orar' in key:
+                    timezone = value
+                elif 'sistem politic' in key:
+                    regime = value
+
+                old_row_title = th.get_text()
+
+    return area, density, capital, neighbors, language, timezone, regime
 
 
 scrape_wikipedia()
