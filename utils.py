@@ -19,6 +19,16 @@ def parse_wikipedia_number_string_to_int(number_string):
     return int(result)
 
 
+# Function to parse population number string
+def parse_population_string_to_int(number_string):
+    # Return default value in case no input is provided (shouldn't happen)
+    if number_string is None:
+        return -1
+    result = number_string.replace('.', '').replace(',', '').replace(' ', '')
+    # Return converted value
+    return int(result)
+
+
 # Function to parse float represented numerical data on the wikipedia sites, treating special
 # cases such as references to other pages in the process.
 def parse_wikipedia_number_string_to_float(number_string):
@@ -45,88 +55,70 @@ def parse_wikipedia_number_string_to_float(number_string):
 # Different formats found are: displaying dates since when the capital has been instated
 # or if its temporary or de facto or referencing other pages or empty parenthesis (ex Suedia) etc.
 def parse_capital_text(capital):
-    # Filter out wikipedia references such as [2]
-    result = re.sub(r'\[.*?\]', '', remove_diacritics(capital))
-    # Filter out zero width space
-    result = re.sub(r'\u200B', '', result)
+    # Filter out coordinates
+    result = re.sub(r'\d+\.\d+°[NSVE]', '', capital)
+    result = re.sub(r'\d+°\d+′[NSVE]', '', result)
     # Filter out useless parentheses (such as the date since when a capital has become one)
     result = re.sub(r'\([^)]*?(din|note).*?\)', '', result, flags=re.IGNORECASE)
-    # Filter out coordinates
-    result = re.sub(r'\d+\.\d+°[NSVE]', '', result)
-    result = re.sub(r'\d+°\d+′[NSVE]', '', result)
     # Filter out placeholders (Bolivia {{PAGENAME}})
     result = re.sub(r'\{\{.*?\}\}', '', result)
-    # Filter out numbers following letters (remaining references)
-    result = re.sub(r'([a-zA-Z]) \d+', r'\1', result)
-    result = re.sub(r'([a-zA-Z]) [¹-⁰]', r'\1', result)
     # Add a space between closing parenthesis and the following letter if it's the case
     result = re.sub(r'\)(\S)', r') \1', result)
     # Filter out empty parenthesis
     result = re.sub(r'\(\s*\)', '', result)
-    # Replaces whitespace characters with a single space
-    result = re.sub(r'\s+', ' ', result).strip()
+    # Parse with general parsing
+    result = general_parse(result)
 
     return result
 
 
+# Function use to parse neighbors text based on the way wikipedia formats strings
+# and removing data that is not deemed necessary
 def parse_neighbors_text(neighbors):
-    # Filter out wikipedia references such as [2]
-    result = re.sub(r'\[.*?\]', '', remove_diacritics(neighbors))
-    # Filter out zero width space
-    result = re.sub(r'\u200B', '', result)
-    # Filter out numbers following letters (remaining references)
-    result = re.sub(r'([a-zA-Z]) \d+', r'\1', result)
-    result = re.sub(r'([a-zțA-Z]) [¹-⁰]', r'\1', result)
+    # Pre-parse with general parsing
+    result = general_parse(neighbors)
     # Add " / " between neighbors
     result = re.sub(r'([a-z])([A-Z])', r'\1 / \2', result)
-    # Replace multiple whitespaces with a single space
-    result = re.sub(r'\s+', ' ', result).strip()
 
     return result
 
 
+# Function use to parse languages text based on the way wikipedia formats strings
+# and removing data that is not deemed necessary
 def parse_languages_text(languages):
-    # Filter out wikipedia references such as [2]
-    result = re.sub(r'\[.*?\]', '', remove_diacritics(languages))
-    # Filter out zero width space
-    result = re.sub(r'\u200B', '', result)
+    # Pre-parse with general parsing
+    result = general_parse(languages)
     # Fix spacing for commas
     result = re.sub(r'\s*,\s*', r', ', result)
-    # Filter out numbers following letters (remaining references)
-    result = re.sub(r'([a-zA-Z]) \d+', r'\1', result)
-    result = re.sub(r'([a-zțA-Z]) [¹-⁰]', r'\1', result)
     # Add space between languages if missing
     result = re.sub(r'([a-z])([A-Z])', r'\1 \2', result)
-    # Replace multiple whitespaces with a single space
-    result = re.sub(r'\s+', ' ', result).strip()
     # Remove commas if they are the last character
     result = re.sub(r',\s*$', '', result)
+    # Remove remaining references
+    result = re.sub(r'([a-z])(?: \d+| [¹-⁰]+)', r'\1', result)
 
     return result
 
 
-def parse_timezone_text(timezone):
-    # Filter out wikipedia references such as [2]
-    result = re.sub(r'\[.*?\]', '', remove_diacritics(timezone))
-    # Filter out zero width space
-    result = re.sub(r'\u200B', '', result)
-    # Filter out numbers following letters (remaining references)
-    result = re.sub(r'([a-zA-Z]) \d+', r'\1', result)
-    result = re.sub(r'([a-zțA-Z]) [¹-⁰]', r'\1', result)
-    # Replace multiple whitespaces with a single space
-    result = re.sub(r'\s+', ' ', result).strip()
+# Function to parse timezone
+def parse_timezone(timezone):
+    result = general_parse(timezone)
+    # Remove spaces around '+'
+    result = re.sub(r'\s*\+\s*', '+', result)
+    # Remove spaces around '-'
+    result = re.sub(r'\s*-\s*', '-', result)
 
     return result
 
-
-def parse_regime_text(regime):
+# Function use to parse most text based on the way wikipedia formats strings
+# and removing data that is not deemed necessary
+def general_parse(value):
     # Filter out wikipedia references such as [2]
-    result = re.sub(r'\[.*?\]', '', remove_diacritics(regime))
+    result = re.sub(r'\[.*?\]', '', remove_diacritics(value))
     # Filter out zero width space
-    result = re.sub(r'\u200B', '', result)
+    result = re.sub(r'[\u200B\uFEFF]', '', result)
     # Filter out numbers following letters (remaining references)
-    result = re.sub(r'([a-zA-Z]) \d+', r'\1', result)
-    result = re.sub(r'([a-zțA-Z]) [¹-⁰]', r'\1', result)
+    result = re.sub(r'([a-z])(?: \d+ | [¹-⁰]+ |\d+|[¹-⁰]+)', r'\1', result)
     # Replace multiple whitespaces with a single space
     result = re.sub(r'\s+', ' ', result).strip()
 
