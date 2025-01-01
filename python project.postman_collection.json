@@ -1,0 +1,244 @@
+{
+	"info": {
+		"_postman_id": "a563caaa-04ff-4c18-8210-0e9e479429fb",
+		"name": "python project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "35033426"
+	},
+	"item": [
+		{
+			"name": "top 10 countries by population",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/top-10-tari-populatie",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"top-10-tari-populatie"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "top 10 countries by density",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/top-10-tari-densitate",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"top-10-tari-densitate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "top 10 countries by area",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/top-10-tari-suprafata",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"top-10-tari-suprafata"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "fus-orar +2",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/tarile-cu-fus-orar?fus_orar=%2B2",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"tarile-cu-fus-orar"
+					],
+					"query": [
+						{
+							"key": "fus_orar",
+							"value": "%2B2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "fus-orar -4",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/tarile-cu-fus-orar?fus_orar=-4",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"tarile-cu-fus-orar"
+					],
+					"query": [
+						{
+							"key": "fus_orar",
+							"value": "-4"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "tarile care vorbesc chineza",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/tarile-care-vorbesc?limba=chineza",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"tarile-care-vorbesc"
+					],
+					"query": [
+						{
+							"key": "limba",
+							"value": "chineza"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "tarile cu sistem politic monarhie",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/tarile-cu-sistem-politic?sistem_politic=monarhie",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"tarile-cu-sistem-politic"
+					],
+					"query": [
+						{
+							"key": "sistem_politic",
+							"value": "monarhie"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "tarile vecine pentru China",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/tarile-vecine-pentru?tara=China",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"tarile-vecine-pentru"
+					],
+					"query": [
+						{
+							"key": "tara",
+							"value": "China"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "capitala Japoniei",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/capitala-tarii?tara=Japonia",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"capitala-tarii"
+					],
+					"query": [
+						{
+							"key": "tara",
+							"value": "Japonia"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
