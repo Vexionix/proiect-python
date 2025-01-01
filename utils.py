@@ -46,7 +46,9 @@ def parse_wikipedia_number_string_to_float(number_string):
 # or if its temporary or de facto or referencing other pages or empty parenthesis (ex Suedia) etc.
 def parse_capital_text(capital):
     # Filter out wikipedia references such as [2]
-    result = re.sub(r'\[.*?\]', '', capital)
+    result = re.sub(r'\[.*?\]', '', remove_diacritics(capital))
+    # Filter out zero width space
+    result = re.sub(r'\u200B', '', result)
     # Filter out useless parentheses (such as the date since when a capital has become one)
     result = re.sub(r'\([^)]*?(din|note).*?\)', '', result, flags=re.IGNORECASE)
     # Filter out coordinates
@@ -55,8 +57,8 @@ def parse_capital_text(capital):
     # Filter out placeholders (Bolivia {{PAGENAME}})
     result = re.sub(r'\{\{.*?\}\}', '', result)
     # Filter out numbers following letters (remaining references)
-    result = re.sub(r'([a-zăâîșțA-ZĂÂÎȘȚ]) \d+', r'\1', result)
-    result = re.sub(r'([a-zăâîșțA-ZĂÂÎȘȚ]) [¹-⁰]', r'\1', result)
+    result = re.sub(r'([a-zA-Z]) \d+', r'\1', result)
+    result = re.sub(r'([a-zA-Z]) [¹-⁰]', r'\1', result)
     # Add a space between closing parenthesis and the following letter if it's the case
     result = re.sub(r'\)(\S)', r') \1', result)
     # Filter out empty parenthesis
@@ -69,12 +71,14 @@ def parse_capital_text(capital):
 
 def parse_neighbors_text(neighbors):
     # Filter out wikipedia references such as [2]
-    result = re.sub(r'\[.*?\]', '', neighbors)
+    result = re.sub(r'\[.*?\]', '', remove_diacritics(neighbors))
+    # Filter out zero width space
+    result = re.sub(r'\u200B', '', result)
     # Filter out numbers following letters (remaining references)
-    result = re.sub(r'([a-zăâîșțA-ZĂÂÎȘȚ]) \d+', r'\1', result)
-    result = re.sub(r'([a-zăâîșțA-ZĂÂÎȘȚ]) [¹-⁰]', r'\1', result)
+    result = re.sub(r'([a-zA-Z]) \d+', r'\1', result)
+    result = re.sub(r'([a-zțA-Z]) [¹-⁰]', r'\1', result)
     # Add " / " between neighbors
-    result = re.sub(r'([a-zăâîșț])([A-ZĂÂÎȘȚ])', r'\1 / \2', result)
+    result = re.sub(r'([a-z])([A-Z])', r'\1 / \2', result)
     # Replace multiple whitespaces with a single space
     result = re.sub(r'\s+', ' ', result).strip()
 
@@ -83,14 +87,16 @@ def parse_neighbors_text(neighbors):
 
 def parse_languages_text(languages):
     # Filter out wikipedia references such as [2]
-    result = re.sub(r'\[.*?\]', '', languages)
+    result = re.sub(r'\[.*?\]', '', remove_diacritics(languages))
+    # Filter out zero width space
+    result = re.sub(r'\u200B', '', result)
     # Fix spacing for commas
     result = re.sub(r'\s*,\s*', r', ', result)
     # Filter out numbers following letters (remaining references)
-    result = re.sub(r'([a-zăâîșțA-ZĂÂÎȘȚ]) \d+', r'\1', result)
-    result = re.sub(r'([a-zăâîșțA-ZĂÂÎȘȚ]) [¹-⁰]', r'\1', result)
+    result = re.sub(r'([a-zA-Z]) \d+', r'\1', result)
+    result = re.sub(r'([a-zțA-Z]) [¹-⁰]', r'\1', result)
     # Add space between languages if missing
-    result = re.sub(r'([a-zăâîșț])([A-ZĂÂÎȘȚ])', r'\1 \2', result)
+    result = re.sub(r'([a-z])([A-Z])', r'\1 \2', result)
     # Replace multiple whitespaces with a single space
     result = re.sub(r'\s+', ' ', result).strip()
     # Remove commas if they are the last character
@@ -98,3 +104,43 @@ def parse_languages_text(languages):
 
     return result
 
+
+def parse_timezone_text(timezone):
+    # Filter out wikipedia references such as [2]
+    result = re.sub(r'\[.*?\]', '', remove_diacritics(timezone))
+    # Filter out zero width space
+    result = re.sub(r'\u200B', '', result)
+    # Filter out numbers following letters (remaining references)
+    result = re.sub(r'([a-zA-Z]) \d+', r'\1', result)
+    result = re.sub(r'([a-zțA-Z]) [¹-⁰]', r'\1', result)
+    # Replace multiple whitespaces with a single space
+    result = re.sub(r'\s+', ' ', result).strip()
+
+    return result
+
+
+def parse_regime_text(regime):
+    # Filter out wikipedia references such as [2]
+    result = re.sub(r'\[.*?\]', '', remove_diacritics(regime))
+    # Filter out zero width space
+    result = re.sub(r'\u200B', '', result)
+    # Filter out numbers following letters (remaining references)
+    result = re.sub(r'([a-zA-Z]) \d+', r'\1', result)
+    result = re.sub(r'([a-zțA-Z]) [¹-⁰]', r'\1', result)
+    # Replace multiple whitespaces with a single space
+    result = re.sub(r'\s+', ' ', result).strip()
+
+    return result
+
+
+def remove_diacritics(string):
+    string = re.sub(r'[ăâ]', 'a', string)
+    string = re.sub(r'[ĂÂ]', 'A', string)
+    string = re.sub(r'[î]', 'i', string)
+    string = re.sub(r'[Î]', 'i', string)
+    string = re.sub(r'[ș]', 's', string)
+    string = re.sub(r'[ÎȘ]', 's', string)
+    string = re.sub(r'[ț]', 't', string)
+    string = re.sub(r'[Ț]', 't', string)
+
+    return string

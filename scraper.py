@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import sqlite3
 import utils
 from utils import parse_wikipedia_number_string_to_int, parse_wikipedia_number_string_to_float, parse_capital_text, \
-    parse_neighbors_text, parse_languages_text
+    parse_neighbors_text, parse_languages_text, parse_regime_text, parse_timezone_text
 
 # Establish connection with the database to save the scraped data
 # in the countries table
@@ -52,7 +52,18 @@ def scrape_wikipedia():
                 if area != -1:
                     density = round(population / area,1)
 
-            print(f"{name} - {area} - {density} - {capital} - {neighbors}")
+            cursor.execute('''SELECT COUNT(*) FROM countries WHERE name = ?''', (name,))
+            existing_entry = cursor.fetchone()[0]
+
+            if existing_entry == 0:
+                cursor.execute('''INSERT INTO countries (name, capital, population, density, area, neighbors, languages, timezone, regime)
+                                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                               (name, capital, population, density, area, neighbors, languages, timezone, regime))
+                print(f"Added country to table - {name}")
+            else:
+                print(f"The country {name} already exists in the database.")
+
+        conn.commit()
 
 
 def scrape_country_details(url):
@@ -94,9 +105,11 @@ def scrape_country_details(url):
                     value = td.get_text(separator=" ").strip()
                     languages = parse_languages_text(value)
                 elif 'fus orar' in key:
-                    timezone = value
+                    value = td.get_text(separator=" ").strip()
+                    timezone = parse_timezone_text(value)
                 elif 'sistem politic' in key:
-                    regime = value
+                    value = td.get_text().strip()
+                    regime = parse_regime_text(value)
 
                 old_row_title = th.get_text()
 

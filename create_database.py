@@ -13,7 +13,7 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS countries (
     density REAL,
     area INTEGER,
     neighbors TEXT,
-    language TEXT,
+    languages TEXT,
     timezone TEXT,
     regime TEXT
 )''')
