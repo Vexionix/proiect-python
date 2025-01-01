@@ -54,3 +54,13 @@ def parse_capital_text(capital):
     result = re.sub(r'\s+', ' ', result).strip()
 
     return result
+
+
+def parse_neighbors_text(neighbors):
+    # Filter out wikipedia references such as [2]
+    result = re.sub(r'\[.*?\]', '', neighbors)
+    # Add " / " between neighbors
+    result = re.sub(r'([a-zăâîșț])([A-ZĂÂÎȘȚ])', r'\1 / \2', result)
+    # Replace multiple whitespaces with a single space
+    result = re.sub(r'\s+', ' ', result).strip()
+    return result

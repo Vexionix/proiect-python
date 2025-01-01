@@ -2,7 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 import sqlite3
 import utils
-from utils import parse_wikipedia_number_string_to_int, parse_wikipedia_number_string_to_float, parse_capital_text
+from utils import parse_wikipedia_number_string_to_int, parse_wikipedia_number_string_to_float, parse_capital_text, \
+    parse_neighbors_text
 
 # Establish connection with the database to save the scraped data
 # in the countries table
@@ -51,7 +52,7 @@ def scrape_wikipedia():
                 if area != -1:
                     density = round(population / area,1)
 
-            print(f"{name} - {area} - {capital}")
+            print(f"{name} - {area} - {neighbors}")
 
 
 def scrape_country_details(url):
@@ -85,7 +86,7 @@ def scrape_country_details(url):
                 elif 'capitala' in key:
                     capital = parse_capital_text(value)
                 elif 'vecini' in key:
-                    neighbors = value
+                    neighbors = parse_neighbors_text(value)
                 elif 'limbi oficiale' in key:
                     language = value
                 elif 'fus orar' in key:
