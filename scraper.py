@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import sqlite3
 import utils
 from utils import parse_wikipedia_number_string_to_int, parse_wikipedia_number_string_to_float, parse_capital_text, \
-    parse_neighbors_text
+    parse_neighbors_text, parse_languages_text
 
 # Establish connection with the database to save the scraped data
 # in the countries table
@@ -46,13 +46,13 @@ def scrape_wikipedia():
             population_as_string = cols[2].text.strip().replace(".", "")
             population = int(population_as_string) if population_as_string.isdigit() else None
 
-            area, density, capital, neighbors, language, timezone, regime = scrape_country_details(country_url)
+            area, density, capital, neighbors, languages, timezone, regime = scrape_country_details(country_url)
 
             if density == -1.0:
                 if area != -1:
                     density = round(population / area,1)
 
-            print(f"{name} - {area} - {neighbors}")
+            print(f"{name} - {area} - {density} - {capital} - {neighbors}")
 
 
 def scrape_country_details(url):
@@ -61,7 +61,7 @@ def scrape_country_details(url):
     infobox = soup.find('table', {'class': 'infocaseta'})
 
     # Set default values to the fields
-    area, density, capital, neighbors, language, timezone, regime = -1, -1.0, "Unknown", "Unknown", "Unknown", "Unknown", "Unknown"
+    area, density, capital, neighbors, languages, timezone, regime = -1, -1.0, "Unknown", "Unknown", "Unknown", "Unknown", "Unknown"
     # Variable used for keeping old title with the purpose of
     # checking if the row is adjacent to the area field in the table
     # due to the way the country data is displayed in romanian wikipedia pages
@@ -77,18 +77,22 @@ def scrape_country_details(url):
             if th and td:
                 key = th.get_text(
                     strip=True).lower()
-                value = td.get_text()
 
                 if 'total' in key and "Suprafață" in old_row_title:
+                    value = td.get_text().strip()
                     area = parse_wikipedia_number_string_to_int(value.strip())
                 elif 'densitate' in key:
+                    value = td.get_text().strip()
                     density = round(parse_wikipedia_number_string_to_float(value.strip()), 1)
                 elif 'capitala' in key:
+                    value = td.get_text().strip()
                     capital = parse_capital_text(value)
                 elif 'vecini' in key:
+                    value = td.get_text().strip()
                     neighbors = parse_neighbors_text(value)
                 elif 'limbi oficiale' in key:
-                    language = value
+                    value = td.get_text(separator=" ").strip()
+                    languages = parse_languages_text(value)
                 elif 'fus orar' in key:
                     timezone = value
                 elif 'sistem politic' in key:
@@ -96,7 +100,7 @@ def scrape_country_details(url):
 
                 old_row_title = th.get_text()
 
-    return area, density, capital, neighbors, language, timezone, regime
+    return area, density, capital, neighbors, languages, timezone, regime
 
 
 scrape_wikipedia()
