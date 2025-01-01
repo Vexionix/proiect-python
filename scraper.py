@@ -9,12 +9,13 @@ conn = sqlite3.connect('states_of_the_world.db')
 cursor = conn.cursor()
 
 
-# Scrape the searched data for each country found in the table. It first gets each row of
-# the table and then parses the content to get the link to each country's page which
-# then scrapes again to get the desired data such as name, population etc. I chose to
-# extract the data in romanian, but I could also have used the english wikipedia page
-# just as well, possibly needing slight adjustments in logic (such as treating svg links).
 def scrape_wikipedia():
+    """
+    Scrape the searched data for each country found in the table. It first gets each row of
+    the table and then parses the content to get the link to each country's page which
+    then scrapes again to get the desired data such as name, population etc. The data is
+    extracted from the romanian wikipedia site.
+    """
     # Prepare the base url used when concatenating it with the href link of each country
     # Using romanian version of wikipedia
     base_url = "https://ro.wikipedia.org"
@@ -89,11 +90,16 @@ def scrape_wikipedia():
         conn.commit()
 
 
-# Extract data from each country's page that is not found in the main table page. The method
-# works for romanian wikipedia country pages, as it looks for specific keywords found in those.
-# It looks in the information box found in the upper right of the page, a table marked as "infocaseta"
-# where most crucial information is found. Some countries miss some datas and as such have default values
 def scrape_country_details(url):
+    """
+    Extract data from each country's page that is not found in the main table page. The method
+    works for romanian wikipedia country pages, as it looks for specific keywords found in those.
+    It looks in the information box found in the upper right of the page, a table marked as "infocaseta"
+    where most crucial information is found. Some countries miss some datas and as such have default values
+    :param url: The URL of the country's wikipedia page for which the method will scrape details
+    :return: The details of the country after scraping data or default values if none were found
+    """
+
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
     # Extract the information box on the upper right side of the wikipedia page
