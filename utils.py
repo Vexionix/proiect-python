@@ -16,7 +16,7 @@ def parse_wikipedia_number_string_to_int(number_string):
         return -1
     # Filter out wikipedia references such as [2]
     number_string = re.sub(r'\[.*?\]', '', number_string)
-    match = re.search(r'([\d., ]+)\s*km²', number_string)
+    match = re.search(r'([\d., ]+)\s*k', number_string)
     if match:
         result = match.group(1)
     else:
@@ -26,6 +26,12 @@ def parse_wikipedia_number_string_to_int(number_string):
         [parts[0]] + [part for part in parts[1:] if len(part) == 3])
     if "." in result and "," in result:
         result = result.split(',')[0]
+    parts = result.split('.')
+    result = ''.join(
+        [parts[0]] + [part for part in parts[1:] if len(part) == 3])
+    parts = result.split(',')
+    result = ''.join(
+        [parts[0]] + [part for part in parts[1:] if len(part) == 3])
     result = result.replace('.', '').replace(',', '').replace(' ', '')
     # Return converted value
     return int(result)
@@ -46,13 +52,14 @@ def parse_population_string_to_int(number_string):
     return int(result)
 
 
-def parse_wikipedia_number_string_to_float(number_string):
+def parse_density_string_to_int(number_string):
     """
-    Function to parse float represented numerical data on the wikipedia
+    Function to parse integer represented numerical data on the wikipedia
     sites, treating special cases such as references to other pages in the
-    process. More specifically used to parse the density value
-    :param number_string: The string that's supposed to contain a float number
-    :return: The float number resulted from the conversion of the given string
+    process. More specifically used for density
+    :param number_string: A string containing a numerical value
+    (specifically country's density)
+    :return: The integer resulted from converting the given string
     """
 
     # Return default value in case no input is provided (shouldn't happen)
@@ -60,19 +67,26 @@ def parse_wikipedia_number_string_to_float(number_string):
         return -1
     # Filter out wikipedia references such as [2]
     number_string = re.sub(r'\[.*?\]', '', number_string)
-    # Select only the number found prior to loc/km^2
-    match = re.search(r'(\d[\d., ]*)\s*loc/km²', number_string)
+    number_string = re.sub(r'\(.*?\)', '', number_string)
+    match = re.search(r'([\d., ]+)\s*l', number_string)
     if match:
         result = match.group(1)
     else:
         return -1
-    result = re.sub(r'\s+\d+\s+', '', result)
-    # Replace "," with "." to allow default conversion of the string to float
+    parts = result.split()
+    result = ''.join(
+        [parts[0]] + [part for part in parts[1:] if len(part) == 3])
     if "." in result and "," in result:
-        result = result.replace(".", "")
-    result = result.replace(',', '.')
+        result = result.split(',')[0]
+    parts = result.split('.')
+    result = ''.join(
+        [parts[0]] + [part for part in parts[1:] if len(part) == 3])
+    parts = result.split(',')
+    result = ''.join(
+        [parts[0]] + [part for part in parts[1:] if len(part) == 3])
+    result = result.replace('.', '').replace(',', '').replace(' ', '')
     # Return converted value
-    return float(result)
+    return int(result)
 
 
 def parse_capital_text(capital):

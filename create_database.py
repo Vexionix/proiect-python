@@ -15,7 +15,7 @@ def create_database():
         name TEXT,
         capital TEXT,
         population INTEGER,
-        density REAL,
+        density INTEGER,
         area INTEGER,
         neighbors TEXT,
         languages TEXT,

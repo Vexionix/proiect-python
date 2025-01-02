@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import sqlite3
 from utils import (parse_wikipedia_number_string_to_int,
                    parse_population_string_to_int,
-                   parse_wikipedia_number_string_to_float,
+                   parse_density_string_to_int,
                    parse_capital_text,
                    parse_languages_text,
                    parse_neighbors_text,
@@ -200,7 +200,7 @@ def scrape_country_details(url):
                 elif 'densitate' in key:
                     value = td.get_text().strip()
                     density = round(
-                        parse_wikipedia_number_string_to_float(
+                        parse_density_string_to_int(
                             value.strip()), 1)
                 elif 'capitala' in key:
                     value = td.get_text().strip()
